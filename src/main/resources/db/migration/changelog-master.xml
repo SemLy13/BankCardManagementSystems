@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+
+    <!-- Initial database setup -->
+    <changeSet id="001-create-roles-table" author="system">
+        <createTable tableName="roles">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="002-create-users-table" author="system">
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(50)"/>
+            <column name="last_name" type="varchar(50)"/>
+            <column name="phone_number" type="varchar(20)"/>
+            <column name="enabled" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="003-create-user-roles-table" author="system">
+        <createTable tableName="user_roles">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Primary key -->
+        <addPrimaryKey columnNames="user_id, role_id" tableName="user_roles"/>
+
+        <!-- Foreign keys -->
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="user_id"
+                                 constraintName="fk_user_roles_user_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="user_roles" baseColumnNames="role_id"
+                                 constraintName="fk_user_roles_role_id"
+                                 referencedTableName="roles" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="004-create-cards-table" author="system">
+        <createTable tableName="cards">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="card_number" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="card_holder_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiry_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cvv" type="varchar(4)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="card_type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="decimal(15,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(16)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Foreign key to users -->
+        <addForeignKeyConstraint baseTableName="cards" baseColumnNames="user_id"
+                                 constraintName="fk_cards_user_id"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <!-- Indexes -->
+        <createIndex tableName="cards" indexName="idx_cards_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="cards" indexName="idx_cards_card_number">
+            <column name="card_number"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="005-create-transactions-table" author="system">
+        <createTable tableName="transactions">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="from_card_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_card_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="decimal(15,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="varchar(3)" defaultValue="RUB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+            <column name="status" type="varchar(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Foreign keys -->
+        <addForeignKeyConstraint baseTableName="transactions" baseColumnNames="from_card_id"
+                                 constraintName="fk_transactions_from_card_id"
+                                 referencedTableName="cards" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="transactions" baseColumnNames="to_card_id"
+                                 constraintName="fk_transactions_to_card_id"
+                                 referencedTableName="cards" referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <!-- Indexes -->
+        <createIndex tableName="transactions" indexName="idx_transactions_from_card">
+            <column name="from_card_id"/>
+        </createIndex>
+
+        <createIndex tableName="transactions" indexName="idx_transactions_to_card">
+            <column name="to_card_id"/>
+        </createIndex>
+
+        <createIndex tableName="transactions" indexName="idx_transactions_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="transactions" indexName="idx_transactions_created_at">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Insert default roles -->
+    <changeSet id="006-insert-default-roles" author="system">
+        <insert tableName="roles">
+            <column name="name" value="ROLE_USER"/>
+            <column name="description" value="Regular user role"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="ROLE_ADMIN"/>
+            <column name="description" value="Administrator role"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert default admin user (password: admin123) -->
+    <changeSet id="007-insert-default-admin" author="system">
+        <sql>
+            INSERT INTO users (username, email, password, first_name, last_name, enabled)
+            VALUES ('admin', 'admin@bankcards.local', '$2b$12$LPgtor5V05Vq84b8UvYVk.OWWVa6z1TWFZOhymowLB1ePFu4jP2GC', 'Admin', 'User', true)
+            ON CONFLICT (username) DO NOTHING;
+
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT u.id, r.id
+            FROM users u
+            JOIN roles r ON r.name = 'ROLE_ADMIN'
+            WHERE u.username = 'admin'
+            ON CONFLICT DO NOTHING;
+        </sql>
+        <rollback>
+            DELETE FROM user_roles WHERE user_id IN (SELECT id FROM users WHERE username = 'admin');
+            DELETE FROM users WHERE username = 'admin';
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

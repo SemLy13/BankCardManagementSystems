@@ -1,0 +1,8 @@
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\TestConfig.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\exception\TestController.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\exception\GlobalExceptionHandlerTest.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\service\UserServiceTest.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\controller\AuthControllerTest.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\controller\UserControllerTest.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\repository\UserRepositoryTest.java
+D:\T\t2\bank_rest\src\test\java\com\example\bankcards\integration\UserManagementIntegrationTest.java

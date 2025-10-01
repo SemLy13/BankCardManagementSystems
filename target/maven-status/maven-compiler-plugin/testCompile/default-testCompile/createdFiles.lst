@@ -1,0 +1,8 @@
+com\example\bankcards\integration\UserManagementIntegrationTest.class
+com\example\bankcards\service\UserServiceTest.class
+com\example\bankcards\controller\AuthControllerTest.class
+com\example\bankcards\exception\GlobalExceptionHandlerTest.class
+com\example\bankcards\controller\UserControllerTest.class
+com\example\bankcards\repository\UserRepositoryTest.class
+com\example\bankcards\exception\TestController.class
+com\example\bankcards\TestConfig.class

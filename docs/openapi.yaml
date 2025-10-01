@@ -1,1 +1,176 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.3
+info:
+  title: Bank Cards API
+  description: REST API для управления банковскими картами, пользователями и транзакциями
+  version: 1.0.0
+  contact:
+    name: Bank Cards Team
+    email: support@bankcards.com
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер разработки
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT токен авторизации. Пример использования в заголовке Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Неверные данные запроса"
+            details:
+              type: string
+              example: "Подробное описание ошибки"
+            timestamp:
+              type: string
+              format: date-time
+              example: "2025-10-01T12:00:00"
+            path:
+              type: string
+              example: "/api/users/123"
+            validationErrors:
+              type: object
+              additionalProperties:
+                type: string
+              example:
+                username: "Username is required"
+                email: "Email should be valid"
+
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+          maxLength: 50
+        lastName:
+          type: string
+          maxLength: 50
+        phoneNumber:
+          type: string
+          maxLength: 20
+        enabled:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        roles:
+          type: array
+          items:
+            type: string
+
+    CardDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        cardNumber:
+          type: string
+          pattern: '^\d{13,19}$'
+        cardHolderName:
+          type: string
+          maxLength: 100
+        expiryDate:
+          type: string
+          format: date
+        cvv:
+          type: string
+          pattern: '^\d{3,4}$'
+        cardType:
+          type: string
+          enum: [DEBIT, CREDIT, PREPAID]
+        balance:
+          type: number
+          format: decimal
+          minimum: 0
+        isActive:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TransactionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fromCardId:
+          type: integer
+          format: int64
+        toCardId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: "RUB"
+        transactionType:
+          type: string
+          enum: [TRANSFER, PAYMENT, DEPOSIT, WITHDRAWAL, REFUND]
+        description:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED, CANCELLED]
+          default: "PENDING"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+paths:
+  # Здесь будут описаны все эндпоинты API
+  # Они автоматически генерируются через аннотации в контроллерах
