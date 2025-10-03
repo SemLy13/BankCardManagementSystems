@@ -73,8 +73,9 @@ docker run -d --name postgres-bank \
 
 Основные настройки в `application.yml`:
 
-PS: извиняюсь за папки .idea и target :)
 - База данных: PostgreSQL
 - Порт сервера: 8080
 - JWT секрет для аутентификации
 - Настройки логирования
+
+PS: извиняюсь за папки .idea и target :)
