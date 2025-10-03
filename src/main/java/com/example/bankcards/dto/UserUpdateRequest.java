@@ -25,10 +25,8 @@ public class UserUpdateRequest {
 
     private Boolean enabled;
 
-    // Constructors
     public UserUpdateRequest() {}
 
-    // Getters and Setters
     public String getFirstName() {
         return firstName;
     }

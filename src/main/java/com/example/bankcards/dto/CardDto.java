@@ -43,10 +43,8 @@ public class CardDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
     public CardDto() {}
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

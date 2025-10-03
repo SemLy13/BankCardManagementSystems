@@ -14,9 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
-/**
- * Конфигурация OpenAPI (Swagger) для банковской системы
- */
+
 @Configuration
 public class OpenApiConfig {
 

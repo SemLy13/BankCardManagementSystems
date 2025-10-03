@@ -29,10 +29,8 @@ public class UserCreateRequest {
 
     private Boolean enabled = true;
 
-    // Constructors
     public UserCreateRequest() {}
 
-    // Getters and Setters
     public String getUsername() {
         return username;
     }

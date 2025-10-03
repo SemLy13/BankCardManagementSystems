@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class CardMapper {
 
     @Autowired
-    private UserRepository userRepository; // Временно для примера, лучше использовать сервис
+    private UserRepository userRepository;
 
     @Mapping(target = "userId", source = "user.id")
     public abstract CardDto toDto(Card card);

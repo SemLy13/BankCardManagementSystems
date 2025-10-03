@@ -15,84 +15,53 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    /**
-     * Найти транзакции по карте отправителя
-     */
-    List<Transaction> findByFromCardId(Long fromCardId);
 
-    /**
-     * Найти транзакции по карте получателя
-     */
+        List<Transaction> findByFromCardId(Long fromCardId);
+
     List<Transaction> findByToCardId(Long toCardId);
 
-    /**
-     * Найти транзакции между двумя картами
-     */
+
     List<Transaction> findByFromCardIdAndToCardId(Long fromCardId, Long toCardId);
 
-    /**
-     * Найти транзакции по статусу
-     */
+
     List<Transaction> findByStatus(TransactionStatus status);
 
-    /**
-     * Найти транзакции по типу
-     */
+
     List<Transaction> findByTransactionType(TransactionType transactionType);
 
-    /**
-     * Найти транзакции по сумме больше указанной
-     */
+
     List<Transaction> findByAmountGreaterThan(BigDecimal amount);
 
-    /**
-     * Найти транзакции по сумме в диапазоне
-     */
+
     List<Transaction> findByAmountBetween(BigDecimal minAmount, BigDecimal maxAmount);
 
-    /**
-     * Найти транзакции за период времени
-     */
+
     List<Transaction> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
-    /**
-     * Найти транзакции пользователя (по любой из его карт)
-     */
+
     @Query("SELECT t FROM Transaction t WHERE t.fromCard.user.id = :userId OR t.toCard.user.id = :userId")
     List<Transaction> findByUserId(@Param("userId") Long userId);
 
-    /**
-     * Найти транзакции по карте пользователя с пагинацией и сортировкой
-     */
+
     @Query("SELECT t FROM Transaction t WHERE t.fromCard.id = :cardId OR t.toCard.id = :cardId ORDER BY t.createdAt DESC")
     List<Transaction> findByCardIdOrderByCreatedAtDesc(@Param("cardId") Long cardId);
 
-    /**
-     * Подсчитать количество транзакций по статусу
-     */
+
     long countByStatus(TransactionStatus status);
 
-    /**
-     * Подсчитать сумму всех транзакций по типу
-     */
+
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.transactionType = :type AND t.status = 'COMPLETED'")
     BigDecimal sumAmountByTransactionTypeAndStatusCompleted(@Param("type") TransactionType type);
 
-    /**
-     * Найти последние N транзакций по карте
-     */
+
     @Query(value = "SELECT * FROM transactions WHERE from_card_id = :cardId OR to_card_id = :cardId ORDER BY created_at DESC LIMIT :limit", nativeQuery = true)
     List<Transaction> findTopNByCardIdOrderByCreatedAtDesc(@Param("cardId") Long cardId, @Param("limit") int limit);
 
-    /**
-     * Найти транзакции по описанию (поиск по части строки)
-     */
+
     @Query("SELECT t FROM Transaction t WHERE LOWER(t.description) LIKE LOWER(CONCAT('%', :description, '%'))")
     List<Transaction> findByDescriptionContaining(@Param("description") String description);
 
-    /**
-     * Найти неуспешные транзакции за последние N дней
-     */
+
     @Query("SELECT t FROM Transaction t WHERE t.status IN ('FAILED', 'CANCELLED') AND t.createdAt >= :since")
     List<Transaction> findFailedTransactionsSince(@Param("since") LocalDateTime since);
 }

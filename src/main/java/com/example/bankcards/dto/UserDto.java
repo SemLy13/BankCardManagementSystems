@@ -37,10 +37,8 @@ public class UserDto {
     private LocalDateTime updatedAt;
     private Set<String> roles;
 
-    // Constructors
     public UserDto() {}
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

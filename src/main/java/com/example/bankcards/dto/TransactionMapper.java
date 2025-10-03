@@ -29,8 +29,6 @@ public abstract class TransactionMapper {
     public abstract void updateTransactionFromDto(TransactionDto dto, @MappingTarget Transaction transaction);
 
     protected Card getCardById(Long cardId) {
-        // Здесь должен быть вызов сервиса для получения карты
-        // Пока оставлю заглушку
         throw new UnsupportedOperationException("Card lookup should be implemented in service layer");
     }
 }

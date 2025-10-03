@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * REST контроллер для управления банковскими транзакциями
- */
 @RestController
 @RequestMapping("/api/transactions")
 @Tag(name = "Transaction Management", description = "API для управления банковскими транзакциями")
@@ -63,7 +60,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Перевести средства между своими картами", description = "Выполняет перевод средств между картами пользователя")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Перевод выполнен успешно"),
@@ -324,7 +321,6 @@ public class TransactionController {
         return ResponseEntity.ok(transactionDtos);
     }
 
-    // Вспомогательные методы конвертации
     private TransactionDto convertToDto(Transaction transaction) {
         TransactionDto dto = new TransactionDto();
         dto.setId(transaction.getId());

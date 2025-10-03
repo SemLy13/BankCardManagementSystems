@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * REST контроллер для управления пользователями
- */
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "User Management", description = "API для управления пользователями")
@@ -205,8 +202,6 @@ public class UserController {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // Здесь нужно добавить метод в UserService для пагинации
-        // Пока возвращаем обычный список как заглушку
         List<User> users = userService.findAll();
         Page<User> userPage = new org.springframework.data.domain.PageImpl<>(users, pageable, users.size());
 
@@ -228,7 +223,6 @@ public class UserController {
         return ResponseEntity.ok(count);
     }
 
-    // Вспомогательные методы конвертации
     private UserDto convertToDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());

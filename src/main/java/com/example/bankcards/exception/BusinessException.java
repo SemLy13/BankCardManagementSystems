@@ -2,9 +2,6 @@ package com.example.bankcards.exception;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * Бизнес-исключение с кодом ошибки и HTTP статусом
- */
 public class BusinessException extends RuntimeException {
 
     private final String errorCode;

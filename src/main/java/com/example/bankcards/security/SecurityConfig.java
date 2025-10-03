@@ -51,27 +51,22 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                // Открытые эндпоинты
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll() // Для H2 консоли в dev режиме
+                .requestMatchers("/h2-console/**").permitAll()
 
-                // Админские эндпоинты
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Пользовательские эндпоинты
                 .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/cards/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/api/transactions/**").hasAnyRole("USER", "ADMIN")
 
-                // Все остальные запросы требуют аутентификации
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Для H2 консоли (только в dev режиме)
         http.headers(headers -> headers.frameOptions().disable());
 
         return http.build();

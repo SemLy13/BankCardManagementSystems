@@ -12,10 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Сервис для управления банковскими транзакциями
- * Содержит бизнес-логику переводов и управления транзакциями
- */
+
 @Service
 @Transactional(readOnly = true)
 public class TransactionService {
@@ -26,9 +23,7 @@ public class TransactionService {
     @Autowired
     private CardRepository cardRepository;
 
-    /**
-     * Создать транзакцию перевода между картами
-     */
+
     @Transactional
     public Transaction createTransferTransaction(Long fromCardId, Long toCardId,
                                                 BigDecimal amount, String description) {
@@ -46,7 +41,7 @@ public class TransactionService {
         Card toCard = cardRepository.findById(toCardId)
                 .orElseThrow(() -> new IllegalArgumentException("Карта получателя не найдена"));
 
-        // Проверка активности карт
+
         if (!fromCard.getIsActive()) {
             throw new IllegalStateException("Карта отправителя не активна");
         }
@@ -55,12 +50,12 @@ public class TransactionService {
             throw new IllegalStateException("Карта получателя не активна");
         }
 
-        // Проверка достаточности средств
+
         if (fromCard.getBalance().compareTo(amount) < 0) {
             throw new IllegalStateException("Недостаточно средств на карте отправителя");
         }
 
-        // Создание транзакции
+
         Transaction transaction = new Transaction();
         transaction.setFromCard(fromCard);
         transaction.setToCard(toCard);
@@ -71,7 +66,7 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        // Выполнение перевода
+
         try {
             executeTransfer(savedTransaction);
         } catch (Exception e) {
@@ -83,31 +78,24 @@ public class TransactionService {
         return savedTransaction;
     }
 
-    /**
-     * Выполнить перевод средств (внутренний метод)
-     */
+
     @Transactional
     public void executeTransfer(Transaction transaction) {
         Card fromCard = transaction.getFromCard();
         Card toCard = transaction.getToCard();
         BigDecimal amount = transaction.getAmount();
 
-        // Списание средств с карты отправителя
         fromCard.setBalance(fromCard.getBalance().subtract(amount));
         cardRepository.save(fromCard);
 
-        // Пополнение карты получателя
         toCard.setBalance(toCard.getBalance().add(amount));
         cardRepository.save(toCard);
 
-        // Обновление статуса транзакции
         transaction.setStatus(TransactionStatus.COMPLETED);
         transactionRepository.save(transaction);
     }
 
-    /**
-     * Создать транзакцию платежа
-     */
+
     @Transactional
     public Transaction createPaymentTransaction(Long fromCardId, BigDecimal amount,
                                               String description) {
@@ -135,7 +123,7 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        // Выполнение платежа
+
         try {
             executePayment(savedTransaction);
         } catch (Exception e) {
@@ -147,15 +135,13 @@ public class TransactionService {
         return savedTransaction;
     }
 
-    /**
-     * Выполнить платеж (внутренний метод)
-     */
+
     @Transactional
     public void executePayment(Transaction transaction) {
         Card fromCard = transaction.getFromCard();
         BigDecimal amount = transaction.getAmount();
 
-        // Списание средств
+
         fromCard.setBalance(fromCard.getBalance().subtract(amount));
         cardRepository.save(fromCard);
 
@@ -163,9 +149,7 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    /**
-     * Подтвердить транзакцию
-     */
+
     @Transactional
     public Transaction confirmTransaction(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
@@ -195,9 +179,7 @@ public class TransactionService {
         return transaction;
     }
 
-    /**
-     * Отменить транзакцию
-     */
+
     @Transactional
     public Transaction cancelTransaction(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
@@ -211,9 +193,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    /**
-     * Выполнить возврат средств
-     */
+
     @Transactional
     public Transaction refundTransaction(Long originalTransactionId, String reason) {
         Transaction originalTransaction = transactionRepository.findById(originalTransactionId)
@@ -232,7 +212,7 @@ public class TransactionService {
         Card toCard = originalTransaction.getFromCard();
         BigDecimal amount = originalTransaction.getAmount();
 
-        // Создание транзакции возврата
+
         Transaction refundTransaction = new Transaction();
         refundTransaction.setFromCard(fromCard);
         refundTransaction.setToCard(toCard);
@@ -254,91 +234,66 @@ public class TransactionService {
         return savedRefund;
     }
 
-    /**
-     * Найти транзакцию по ID
-     */
+
     public Optional<Transaction> findById(Long id) {
         return transactionRepository.findById(id);
     }
 
-    /**
-     * Получить транзакции по карте отправителя
-     */
+
     public List<Transaction> findByFromCardId(Long fromCardId) {
         return transactionRepository.findByFromCardId(fromCardId);
     }
 
-    /**
-     * Получить транзакции по карте получателя
-     */
+
     public List<Transaction> findByToCardId(Long toCardId) {
         return transactionRepository.findByToCardId(toCardId);
     }
 
-    /**
-     * Получить транзакции между двумя картами
-     */
+
     public List<Transaction> findByCards(Long fromCardId, Long toCardId) {
         return transactionRepository.findByFromCardIdAndToCardId(fromCardId, toCardId);
     }
 
-    /**
-     * Получить транзакции пользователя
-     */
+
     public List<Transaction> findByUserId(Long userId) {
         return transactionRepository.findByUserId(userId);
     }
 
-    /**
-     * Получить транзакции по статусу
-     */
+
     public List<Transaction> findByStatus(TransactionStatus status) {
         return transactionRepository.findByStatus(status);
     }
 
-    /**
-     * Получить транзакции по типу
-     */
+
     public List<Transaction> findByTransactionType(TransactionType type) {
         return transactionRepository.findByTransactionType(type);
     }
 
-    /**
-     * Получить транзакции за период
-     */
+
     public List<Transaction> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return transactionRepository.findByCreatedAtBetween(startDate, endDate);
     }
 
-    /**
-     * Получить транзакции по карте с пагинацией
-     */
+
     public List<Transaction> findByCardIdOrderedByDate(Long cardId) {
         return transactionRepository.findByCardIdOrderByCreatedAtDesc(cardId);
     }
 
-    /**
-     * Получить последние N транзакций по карте
-     */
+
     public List<Transaction> findLastTransactionsByCard(Long cardId, int limit) {
         return transactionRepository.findTopNByCardIdOrderByCreatedAtDesc(cardId, limit);
     }
 
-    /**
-     * Получить сумму транзакций по типу и статусу
-     */
+
     public BigDecimal getTotalAmountByTypeAndStatus(TransactionType type) {
         return transactionRepository.sumAmountByTransactionTypeAndStatusCompleted(type);
     }
 
-    /**
-     * Найти неудачные транзакции за период
-     */
+
     public List<Transaction> findFailedTransactionsSince(LocalDateTime since) {
         return transactionRepository.findFailedTransactionsSince(since);
     }
 
-    // Внутренние методы для выполнения операций
 
     @Transactional
     private void executeDeposit(Transaction transaction) {

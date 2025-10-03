@@ -1,9 +1,6 @@
 package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.example.bankcards.util.CardNumberAttributeConverter;
@@ -15,13 +12,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @Table(name = "cards")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Card {
 
     @Id
-    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -70,7 +64,6 @@ public class Card {
     @OneToMany(mappedBy = "toCard", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Transaction> incomingTransactions = new HashSet<>();
 
-    // Constructors
     public Card() {}
 
     public Card(User user, String cardNumber, String cardHolderName, LocalDate expiryDate,
@@ -83,14 +76,12 @@ public class Card {
         this.cardType = cardType;
     }
 
-    // Вспомогательное: маска номера для отображения
     public String getMaskedCardNumber() {
         if (cardNumber == null || cardNumber.length() < 4) {
             return "****";
         }
         String plain;
         try {
-            // конвертер расшифровывает прозрачно через JPA, но на всякий случай возвращаем уже расшифрованное значение
             plain = this.cardNumber;
         } catch (Exception ex) {
             plain = this.cardNumber;
@@ -99,7 +90,6 @@ public class Card {
         return "**** **** **** " + last4;
     }
 
-    // Вычисление статуса: EXPIRED если истек срок, BLOCKED если не активна
     public CardStatus getCalculatedStatus() {
         if (Boolean.FALSE.equals(isActive)) {
             return CardStatus.BLOCKED;
@@ -108,5 +98,147 @@ public class Card {
             return CardStatus.EXPIRED;
         }
         return CardStatus.ACTIVE;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getCardHolderName() {
+        return cardHolderName;
+    }
+
+    public void setCardHolderName(String cardHolderName) {
+        this.cardHolderName = cardHolderName;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
+    public CardType getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(CardType cardType) {
+        this.cardType = cardType;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public CardStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CardStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Set<Transaction> getOutgoingTransactions() {
+        return outgoingTransactions;
+    }
+
+    public void setOutgoingTransactions(Set<Transaction> outgoingTransactions) {
+        this.outgoingTransactions = outgoingTransactions;
+    }
+
+    public Set<Transaction> getIncomingTransactions() {
+        return incomingTransactions;
+    }
+
+    public void setIncomingTransactions(Set<Transaction> incomingTransactions) {
+        this.incomingTransactions = incomingTransactions;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return id != null && id.equals(card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "id=" + id +
+                ", cardNumber='" + cardNumber + '\'' +
+                ", cardHolderName='" + cardHolderName + '\'' +
+                ", expiryDate=" + expiryDate +
+                ", cvv='" + cvv + '\'' +
+                ", cardType=" + cardType +
+                ", balance=" + balance +
+                ", isActive=" + isActive +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

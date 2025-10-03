@@ -36,10 +36,8 @@ public class TransactionDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Constructors
     public TransactionDto() {}
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

@@ -29,9 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * REST контроллер для административных функций
- */
 @RestController
 @RequestMapping("/api/admin")
 @Tag(name = "Admin Management", description = "API для административного управления")
@@ -46,7 +43,6 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    // ==================== CARD MANAGEMENT ====================
 
     @PostMapping("/cards")
     @Operation(summary = "Создать карту (администратор)", description = "Создает новую банковскую карту")
@@ -57,11 +53,33 @@ public class AdminController {
     })
     public ResponseEntity<CardDto> createCard(@Valid @RequestBody CardDto cardDto) {
         try {
-            Card card = convertCardToEntity(cardDto);
+            System.out.println("Creating card for userId: " + cardDto.getUserId());
+            System.out.println("CardDto balance: " + cardDto.getBalance());
+            
+            User user = userService.findById(cardDto.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден с ID: " + cardDto.getUserId()));
+            
+            Card card = new Card();
+            card.setUser(user);
+            card.setCardNumber(cardDto.getCardNumber());
+            card.setCardHolderName(cardDto.getCardHolderName());
+            card.setExpiryDate(cardDto.getExpiryDate());
+            card.setCvv(cardDto.getCvv());
+            card.setCardType(cardDto.getCardType());
+            card.setBalance(cardDto.getBalance() != null ? cardDto.getBalance() : java.math.BigDecimal.ZERO);
+            card.setIsActive(cardDto.getIsActive() != null ? cardDto.getIsActive() : true);
+            
+            System.out.println("Card balance before service: " + card.getBalance());
+            System.out.println("Card user: " + (card.getUser() != null ? card.getUser().getId() : "null"));
             Card createdCard = cardService.createCard(card);
             return ResponseEntity.status(HttpStatus.CREATED).body(convertCardToDto(createdCard));
         } catch (IllegalArgumentException e) {
+            System.err.println("IllegalArgumentException: " + e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -133,7 +151,6 @@ public class AdminController {
         return ResponseEntity.ok(cardDtos);
     }
 
-    // ==================== USER MANAGEMENT ====================
 
     @GetMapping("/users")
     @Operation(summary = "Получить всех пользователей (администратор)", description = "Возвращает всех пользователей системы")
@@ -201,7 +218,6 @@ public class AdminController {
         }
     }
 
-    // ==================== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ====================
 
     private CardDto convertCardToDto(Card card) {
         CardDto dto = new CardDto();
@@ -220,6 +236,7 @@ public class AdminController {
     }
 
     private Card convertCardToEntity(CardDto dto) {
+        System.out.println("Converting DTO to entity, userId: " + dto.getUserId());
         Card card = new Card();
         card.setCardNumber(dto.getCardNumber());
         card.setCardHolderName(dto.getCardHolderName());
@@ -228,7 +245,17 @@ public class AdminController {
         card.setCardType(dto.getCardType());
         card.setBalance(dto.getBalance() != null ? dto.getBalance() : java.math.BigDecimal.ZERO);
         card.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
-        // Пользователь будет установлен в сервисе через userId
+
+        if (dto.getUserId() != null) {
+            System.out.println("Loading user with ID: " + dto.getUserId());
+            User user = userService.findById(dto.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден с ID: " + dto.getUserId()));
+            card.setUser(user);
+            System.out.println("User loaded and set: " + user.getId());
+        } else {
+            throw new IllegalArgumentException("UserId не может быть null");
+        }
+
         return card;
     }
 

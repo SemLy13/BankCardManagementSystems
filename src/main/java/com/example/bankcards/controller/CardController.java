@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * REST контроллер для пользовательских операций с банковскими картами
- */
 @RestController
 @RequestMapping("/api/cards")
 @Tag(name = "Card Management", description = "API для пользовательских операций с банковскими картами")
@@ -38,7 +35,7 @@ public class CardController {
     private CardService cardService;
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Получить свои карты с пагинацией", description = "Возвращает карты текущего пользователя с поддержкой пагинации и поиска")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Список карт успешно получен"),
@@ -72,7 +69,7 @@ public class CardController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Получить карту по ID", description = "Возвращает карту по её идентификатору")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Карта успешно найдена"),
@@ -88,7 +85,7 @@ public class CardController {
     }
 
     @GetMapping("/{id}/balance")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Получить баланс карты", description = "Возвращает баланс карты")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Баланс успешно получен"),
@@ -104,7 +101,7 @@ public class CardController {
     }
 
     @PostMapping("/{id}/block-request")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @Operation(summary = "Запросить блокировку карты", description = "Пользователь может запросить блокировку своей карты")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Запрос на блокировку отправлен"),
@@ -115,7 +112,6 @@ public class CardController {
     public ResponseEntity<CardDto> requestCardBlock(@Parameter(description = "ID карты") @PathVariable Long id) {
         try {
             String username = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-            // Здесь нужно получить userId по username
             Card card = cardService.requestCardBlock(id, 1L); // Заглушка для userId
             return ResponseEntity.ok(convertToDto(card));
         } catch (IllegalArgumentException | IllegalStateException e) {
@@ -123,7 +119,6 @@ public class CardController {
         }
     }
 
-    // Вспомогательные методы конвертации
     private CardDto convertToDto(Card card) {
         CardDto dto = new CardDto();
         dto.setId(card.getId());
@@ -150,7 +145,6 @@ public class CardController {
         card.setBalance(dto.getBalance() != null ? dto.getBalance() : BigDecimal.ZERO);
         card.setIsActive(dto.getIsActive() != null ? dto.getIsActive() : true);
 
-        // Пользователь будет установлен в сервисе через userId
         return card;
     }
 }
