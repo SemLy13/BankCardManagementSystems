@@ -1,38 +1,19 @@
 # Сущности
 
-JPA-сущности для банковского приложения:
+JPA-сущности банковского приложения.
 
-## Основные сущности:
+## Основные сущности
+- **Role** - роли пользователей (USER, ADMIN)
+- **User** - пользователи (username, email, password, роли)
+- **Card** - банковские карты (номер, баланс, тип, статус)
+- **Transaction** - транзакции (карты, сумма, тип, статус)
 
-### Role
-- Управление ролями пользователей
-- Поля: id, name, description, createdAt, updatedAt
-- Связь: многие-ко-многим с User через user_roles
+## Enums
+- **CardType**: DEBIT, CREDIT, PREPAID
+- **TransactionStatus**: PENDING, COMPLETED, FAILED, CANCELLED
+- **TransactionType**: TRANSFER, PAYMENT, DEPOSIT, WITHDRAWAL, REFUND
 
-### User
-- Пользователи системы
-- Поля: id, username, email, password, firstName, lastName, phoneNumber, enabled, createdAt, updatedAt
-- Связи: многие-ко-многим с Role, один-ко-многим с Card
-
-### Card
-- Банковские карты пользователей
-- Поля: id, userId, cardNumber, cardHolderName, expiryDate, cvv, cardType, balance, isActive, createdAt, updatedAt
-- Связи: многие-к-одному с User, один-ко-многим с Transaction (fromCard, toCard)
-
-### Transaction
-- Транзакции между картами
-- Поля: id, fromCardId, toCardId, amount, currency, transactionType, description, status, createdAt, updatedAt
-- Связи: многие-к-одному с Card (fromCard, toCard)
-
-## Enums:
-- CardType: DEBIT, CREDIT, PREPAID
-- TransactionStatus: PENDING, COMPLETED, FAILED, CANCELLED
-- TransactionType: TRANSFER, PAYMENT, DEPOSIT, WITHDRAWAL, REFUND
-
-## Аннотации:
-- @Entity, @Table для маппинга таблиц
-- @Id, @GeneratedValue для первичных ключей
-- @Column для полей с ограничениями
-- @ManyToOne, @OneToMany, @ManyToMany для связей
-- @CreationTimestamp, @UpdateTimestamp для времени
-- @Enumerated для enum полей
+## Связи
+- User ↔ Role (многие-ко-многим)
+- User → Card (один-ко-многим)
+- Card → Transaction (один-ко-многим)
